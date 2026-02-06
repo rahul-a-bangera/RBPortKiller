@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\RBPortKiller.Core\RBPortKiller.Core.csproj" />
+    <ProjectReference Include="..\RBPortKiller.Infrastructure\RBPortKiller.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- Tool Configuration -->
+    <AssemblyName>rbportkiller</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>rbportkiller</ToolCommandName>
+    <PackageId>RBPortKiller</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Rahul</Authors>
+    <Description>A powerful CLI tool for managing network ports and terminating processes</Description>
+    <PackageTags>cli;port;network;process;management</PackageTags>
+    
+    <!-- Publishing Configuration -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+</Project>
