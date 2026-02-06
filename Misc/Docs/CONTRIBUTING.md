@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to RBPortKiller! This document provides guidelines and information for contributors.
 
-## 🎯 Areas for Contribution
+## Areas for Contribution
 
 We welcome contributions in the following areas:
 

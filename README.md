@@ -1,100 +1,222 @@
-# RB Port Killer 🔌🗡️
+# RBPortKiller
 
-> **View and terminate processes by network port with a sleek, interactive CLI.**
+A command-line tool for managing network ports and terminating processes on Windows. Built with .NET 8 and clean architecture principles.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
+![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)
 
-**RBPortKiller** is a modern, cross-platform (Windows-focused currently) command-line tool designed to help developers and system administrators easily identify and terminate processes occupying network ports. Built with .NET 8 and utilizing `Spectre.Console`, it offers a rich, interactive terminal user interface.
+## Features
 
-## ✨ Features
+- Interactive terminal interface powered by Spectre.Console
+- Real-time port discovery with detailed connection information
+- Process termination with permission validation
+- System process protection prevents accidental termination of critical processes
+- Port creation timestamps with intelligent sorting (newest first)
+- Keyboard navigation with Ctrl+C quick exit support
+- Port list refresh without restarting the application
+- Color-coded connection states for easy visualization
+- Clean architecture with SOLID principles
+- Self-contained single binary executable
 
-- **🔍 Port Discovery**: Instantly list all active TCP and UDP ports.
-- **📊 Detailed Info**: View Process ID (PID), Process Name, Protocol, and Port Number.
-- **🎮 Interactive UI**: Navigate and select processes to kill using a simple, keyboard-driven interface.
-- **🛡️ Safe & Secure**: clear confirmation prompts before terminating any process.
-- **🚀 High Performance**: Lightweight and fast, built on the robust .NET 8 runtime.
+## What You Get
 
-## 🚀 Installation
+When you run `rbportkiller`:
+
+- **Port List View**: Table showing all active ports
+  - Port number and protocol (TCP/UDP/TCPv6/UDPv6)
+  - Process ID (PID) and process name
+  - Local address and connection state
+  - Creation timestamp with intelligent formatting
+
+- **Interactive Selection**: Navigate with arrow keys or type port number
+  - Select port to view details and manage
+  - Refresh port list without restarting
+  - Ctrl+C anytime to exit quickly
+
+- **Safe Process Termination**: Confirmation prompts and permission checks
+  - System processes automatically filtered out
+  - Clear error messages with actionable suggestions
+
+## Installation
 
 ### Prerequisites
-- Windows 10/11 (or later)
-- [PowerShell 5.1+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) (for installation scripts)
 
-### Quick Install (Windows)
+- Windows 10/11 or Windows Server 2016+
+- .NET 8.0 SDK (for building from source)
 
-You can easily install the tool using the provided PowerShell script. This will build the project and add it to your system PATH.
+### Quick Install
 
-1. Clone the repository:
-   ```powershell
-   git clone https://github.com/rahul-a-bangera/RBPortKiller.git
-   cd RBPortKiller
-   ```
+```powershell
+# Clone the repository
+git clone https://github.com/rahul-a-bangera/RBPortKiller.git
+cd RBPortKiller
 
-2. Run the install script:
-   ```powershell
-   .\install.ps1
-   ```
+# Build the application
+dotnet build -c Release
 
-3. Restart your terminal to refresh the PATH environment variables.
+# Run the tool
+dotnet run --project RBPortKiller.CLI
+```
 
-### Manual Build
+### Install as Global Tool
 
-If you prefer to build it yourself:
+```powershell
+# Build and publish
+dotnet publish RBPortKiller.CLI -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
 
-1. Ensure you have the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed.
+# Add to PATH (manual)
+# Copy publish\rbportkiller.exe to a directory in your PATH
+```
 
-2. Build the project:
-   ```powershell
-   dotnet build -c Release
-   ```
+## Usage
 
-3. Publish as a single file executable:
-   ```powershell
-   dotnet publish RBPortKiller.CLI/RBPortKiller.CLI.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
-   ```
+### Basic Usage
 
-## 📖 Usage
-
-Once installed, simply run the following command in your terminal:
-
+Run the tool:
 ```powershell
 rbportkiller
 ```
 
-### Interactive Mode
-1. The tool will scan and display a list of valid open ports and their associated processes.
-2. Use the **Up/Down arrow keys** to highlight a process.
-3. Press **Enter** to select the process you wish to terminate.
-4. Confirm the action when prompted.
+The application will:
+1. Display all active network ports in a table
+2. Allow selection of a port using arrow keys or numeric input
+3. Show detailed information about the selected port
+4. Offer options to terminate the process or return to the list
 
-> **Note**: You may need administrative privileges (Run as Administrator) to view or terminate certain system processes.
+### Keyboard Shortcuts
 
-## 🏗️ Architecture
+- **Arrow Keys / Number Keys**: Navigate and select ports
+- **Ctrl+C**: Exit the application at any time
+- **Enter**: Confirm selection
+- **Escape**: Cancel or go back (in prompts)
 
-The project follows a clean, modular architecture:
+### Example Workflow
 
-- **`RBPortKiller.Core`**: Contains domain entities, interfaces, and core business logic.
-- **`RBPortKiller.Infrastructure`**: Implements system-specific logic (e.g., Windows API calls via `netstat`, `taskkill`).
-- **`RBPortKiller.CLI`**: The presentation layer using `Spectre.Console` for the TUI.
+```
+1. Run rbportkiller
+2. View list of active ports sorted by creation time (newest first)
+3. Select port 8080 (used by a development server)
+4. Choose "Kill Process"
+5. Confirm the action
+6. Process terminated successfully
+7. Port list refreshes automatically
+```
 
-## 🤝 Contributing
+### Admin Privileges
 
-Contributions are welcome! If you have suggestions for improvements or bug fixes, please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Some processes require administrator privileges to terminate. If you encounter permission errors:
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+```powershell
+# Run PowerShell as Administrator, then:
+rbportkiller
+```
 
-## 📄 License
+## Architecture
 
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+The project follows clean architecture principles with clear separation of concerns:
 
----
+```
+RBPortKiller/
+├── RBPortKiller.Core/              # Platform-agnostic business logic
+│   ├── Models/                     # Domain models (PortInfo, Protocol)
+│   ├── Interfaces/                 # Service abstractions
+│   └── Services/                   # Core business services
+│
+├── RBPortKiller.Infrastructure/    # Platform-specific implementations
+│   ├── Windows/                    # Windows implementation
+│   │   ├── Commands/               # Command executors
+│   │   ├── Parsers/                # Output parsers
+│   │   └── Helpers/                # Platform helpers
+│   └── PlatformServiceFactory.cs   # Platform detection & factory
+│
+└── RBPortKiller.CLI/               # Interactive CLI interface
+    ├── UI/                         # UI components and builders
+    ├── Configuration/              # DI configuration
+    └── PortKillerCli.cs            # Main CLI orchestration
+```
 
-<p align="center">
-  Built with ❤️ by Rahul
-</p>
+### Key Design Principles
+
+- **SOLID Principles**: Each class has a single responsibility and depends on abstractions
+- **Platform Abstraction**: Core logic is separated from OS-specific code
+- **Dependency Injection**: Loose coupling through constructor injection
+- **Separation of Concerns**: UI, business logic, and infrastructure are clearly separated
+- **Testability**: Pure functions and interface-based design enable easy testing
+
+## Development
+
+### Building from Source
+
+```powershell
+# Restore dependencies
+dotnet restore
+
+# Build all projects
+dotnet build
+
+# Run in development mode
+dotnet run --project RBPortKiller.CLI
+```
+
+### Project Structure
+
+- **RBPortKiller.Core**: Domain models, interfaces, and core business logic
+- **RBPortKiller.Infrastructure**: Platform-specific implementations (Windows)
+- **RBPortKiller.CLI**: Interactive command-line interface with Spectre.Console
+- **TestPortOpener**: Testing utility for opening dummy ports
+
+### Testing the Tool
+
+Use the included TestPortOpener utility:
+
+```powershell
+# Run test port opener
+dotnet run --project TestPortOpener
+
+# In another terminal, run RBPortKiller
+dotnet run --project RBPortKiller.CLI
+```
+
+See `TestPortOpener/README.md` for detailed testing instructions.
+
+## Contributing
+
+Contributions are welcome! Please read the contributing guidelines before submitting pull requests.
+
+### Key Guidelines
+
+- Follow SOLID principles and clean architecture patterns
+- Use proper namespaces and file organization
+- Add XML documentation for public APIs
+- Separate I/O operations from business logic
+- Test your changes thoroughly
+
+See `CONTRIBUTING.md` for detailed guidelines.
+
+## Documentation
+
+- **Usage Guide**: `Misc/Docs/USAGE.md` (detailed usage instructions)
+- **Architecture**: `Misc/Docs/ARCHITECTURE.md` (detailed architecture documentation)
+- **Development**: `Misc/Docs/DEVELOPMENT.md` (development setup and guidelines)
+- **Testing**: `TestPortOpener/README.md` (testing utility documentation)
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Platform Support
+
+Currently supports Windows 10/11 and Windows Server 2016+.
+
+The architecture is designed for easy extension to Linux and macOS. To add support:
+1. Create platform-specific implementations of `IPortDiscoveryService` and `IProcessManagementService`
+2. Update `PlatformServiceFactory` to detect and return the new implementations
+3. Test on the target platform
+
+## Acknowledgments
+
+Built with:
+- [.NET 8](https://dotnet.microsoft.com/)
+- [Spectre.Console](https://spectreconsole.net/) for rich terminal UI
+- Clean architecture principles and SOLID design patterns
