@@ -1,282 +1,319 @@
-# Test Port Opener
+# TestPortOpener
 
-A utility application for testing **RBPortKiller** functionality by opening multiple dummy network ports.
+Testing utility for RBPortKiller that opens dummy TCP and UDP ports.
 
 ## Purpose
 
-This tool helps you test RBPortKiller by:
-- Creating multiple TCP and UDP listeners on various ports
-- Simulating real-world port usage scenarios
-- Testing port creation time sorting
-- Verifying system process filtering works correctly
+TestPortOpener helps verify RBPortKiller functionality by:
+- Creating multiple network listeners on specified ports
+- Testing port discovery and display
+- Validating creation time sorting
+- Verifying system process filtering
+- Confirming process termination works correctly
 
-## Quick Start
+## Running the Tool
 
 ### Windows
+
 ```cmd
 run-test-ports.bat
 ```
 
 ### Linux/Mac
+
 ```bash
 chmod +x run-test-ports.sh
 ./run-test-ports.sh
 ```
 
 ### Manual
+
 ```bash
 dotnet run --project TestPortOpener
 ```
 
 ## Test Modes
 
-### 1. Simple Mode (Option 1)
+### Mode 1: Simple Port Opening
 
-Opens 7 ports immediately:
+Opens 7 ports simultaneously:
 
 | Port | Protocol | Description |
 |------|----------|-------------|
-| 3000 | TCP | Development Server |
-| 5000 | TCP | API Server |
-| 8080 | TCP | Web Server |
-| 9000 | TCP | Test Service |
-| 7777 | TCP | Game Server |
-| 6000 | UDP | UDP Service 1 |
-| 6001 | UDP | UDP Service 2 |
+| 3000 | TCP | Development server |
+| 5000 | TCP | API server |
+| 8080 | TCP | Web server |
+| 9000 | TCP | Test service |
+| 7777 | TCP | Game server |
+| 6000 | UDP | UDP service 1 |
+| 6001 | UDP | UDP service 2 |
 
-**Use Case**: Quick testing of basic RBPortKiller functionality.
+**Use for**:
+- Basic functionality testing
+- Verifying port discovery
+- Testing process termination
+- Quick validation
 
-### 2. Advanced Mode (Option 2)
+### Mode 2: Advanced Staged Opening
 
-Opens ports in stages with delays to test creation time sorting:
+Opens ports in three stages with delays:
 
 **Stage 1** (T+0s):
-- Port 3000 - Initial Dev Server
-- Port 5000 - Initial API Server
+- Port 3000 (TCP)
+- Port 5000 (TCP)
+
+**Wait 2 seconds**
 
 **Stage 2** (T+2s):
-- Port 8080 - Delayed Web Server
-- Port 9000 - Delayed Service
+- Port 8080 (TCP)
+- Port 9000 (TCP)
+
+**Wait 3 seconds**
 
 **Stage 3** (T+5s):
-- Port 7777 - Latest Game Server
-- Port 4200 - Latest Angular App
-- Port 6000 - Active Service (with simulated connections)
+- Port 7777 (TCP)
+- Port 4200 (TCP)
+- Port 6000 (UDP)
 
-**Use Case**: Testing creation time sorting, verifying newest ports appear first.
+**Use for**:
+- Testing creation time sorting
+- Verifying newest-first ordering
+- Validating timestamp display
 
-## What to Test
+## Testing Scenarios
 
-### ? System Process Filtering
+### Test 1: Port Discovery
+
+**Objective**: Verify all ports are discovered
+
+**Steps**:
+1. Run TestPortOpener (any mode)
+2. Run RBPortKiller
+3. Verify all TestPortOpener ports appear in the list
+
+**Expected**:
+- All opened ports visible
+- Protocol types correct (TCP/UDP)
+- Process name shows "TestPortOpener"
+
+### Test 2: System Process Filtering
+
+**Objective**: Confirm TestPortOpener is not treated as system process
+
+**Steps**:
 1. Run TestPortOpener
 2. Run RBPortKiller
-3. **Verify**: TestPortOpener appears in the list (it's NOT a system process)
-4. **Verify**: No Windows system processes appear (svchost, System, etc.)
+3. Check port list
 
-### ? Creation Time Display
-1. Run TestPortOpener in **Simple Mode**
-2. Wait a few seconds
+**Expected**:
+- TestPortOpener appears in list
+- No critical system processes visible (svchost, System, csrss, lsass)
+
+### Test 3: Creation Time Display
+
+**Objective**: Verify creation timestamps are accurate
+
+**Steps**:
+1. Run TestPortOpener (Simple Mode)
+2. Note the timestamps shown in TestPortOpener output
 3. Run RBPortKiller
-4. **Verify**: Creation times are displayed correctly
-5. **Check**: Times should be very recent (within last minute)
+4. Check "Created" column for TestPortOpener ports
 
-### ? Creation Time Sorting
-1. Run TestPortOpener in **Advanced Mode**
-2. Wait for all stages to complete (about 6 seconds)
+**Expected**:
+- All ports show creation times
+- Times match approximately when TestPortOpener started
+- Same-day ports show time only (HH:mm:ss format)
+
+### Test 4: Creation Time Sorting
+
+**Objective**: Confirm ports are sorted newest first
+
+**Steps**:
+1. Run TestPortOpener (Advanced Mode)
+2. Wait for all three stages to complete (~6 seconds)
 3. Run RBPortKiller
-4. **Verify**: Port 4200 and 7777 should be at the **top** (newest)
-5. **Verify**: Port 8080 and 9000 should be in the **middle**
-6. **Verify**: Port 3000 and 5000 should be near the **bottom** (oldest)
+4. Check port order
 
-### ? Port Termination
+**Expected Ordering** (top to bottom):
+1. Stage 3 ports (4200, 7777, 6000) - newest
+2. Stage 2 ports (8080, 9000) - middle
+3. Stage 1 ports (3000, 5000) - oldest
+
+### Test 5: Process Termination
+
+**Objective**: Verify process termination works correctly
+
+**Steps**:
 1. Run TestPortOpener
 2. Run RBPortKiller
-3. Select any port owned by "TestPortOpener"
+3. Select any TestPortOpener port
 4. Choose "Kill Process"
-5. **Verify**: Process terminates successfully
-6. **Verify**: All ports close (TestPortOpener window closes)
-7. **Verify**: No error messages about access denied
+5. Confirm action
 
-### ? Multiple Instances
-1. Run TestPortOpener (first instance)
-2. Change port numbers in code or run from different terminal
-3. Run another instance (if ports don't conflict)
-4. **Verify**: Both show up separately in RBPortKiller
-5. **Verify**: You can kill them individually
+**Expected**:
+- Process terminates successfully
+- All TestPortOpener ports close
+- TestPortOpener console window closes
+- No permission errors
 
-## Expected Behavior in RBPortKiller
+### Test 6: Port Refresh
 
-When you open RBPortKiller while TestPortOpener is running, you should see:
+**Objective**: Test port list refresh functionality
+
+**Steps**:
+1. Run RBPortKiller first
+2. Note current port list
+3. Run TestPortOpener
+4. In RBPortKiller, select "Refresh Port List"
+5. Verify TestPortOpener ports now appear
+
+**Expected**:
+- Port list updates with new ports
+- TestPortOpener ports visible after refresh
+- Creation times show recent timestamps
+
+### Test 7: Multiple Instances
+
+**Objective**: Test with multiple TestPortOpener instances
+
+**Steps**:
+1. Run TestPortOpener instance 1
+2. Run TestPortOpener instance 2 (different ports or same)
+3. Run RBPortKiller
+
+**Expected**:
+- All ports from both instances visible
+- Separate process IDs
+- Can terminate each instance independently
+
+## Interpreting Output
+
+### TestPortOpener Console Output
 
 ```
-#   Port   Protocol   PID    Process Name      Local Address   State       Created
-??????????????????????????????????????????????????????????????????????????????????
-1   7777   TCP        1234   TestPortOpener    0.0.0.0        LISTENING   14:32:15
-2   4200   TCP        1234   TestPortOpener    0.0.0.0        LISTENING   14:32:15
-3   9000   TCP        1234   TestPortOpener    0.0.0.0        LISTENING   14:32:13
-4   8080   TCP        1234   TestPortOpener    0.0.0.0        LISTENING   14:32:13
-5   5000   TCP        1234   TestPortOpener    0.0.0.0        LISTENING   14:32:11
-6   3000   TCP        1234   TestPortOpener    0.0.0.0        LISTENING   14:32:11
-7   6000   UDP        1234   TestPortOpener    0.0.0.0        N/A         14:32:15
+TestPortOpener - Port Testing Utility
+========================================
+
+Choose a mode:
+1. Simple Mode: Open all ports at once
+2. Advanced Mode: Open ports in stages (for testing time sorting)
+3. Exit
+
+Selection: 1
+
+Opening ports...
+[14:32:15] TCP Listener on port 3000 started
+[14:32:15] TCP Listener on port 5000 started
+[14:32:15] TCP Listener on port 8080 started
+[14:32:15] TCP Listener on port 9000 started
+[14:32:15] TCP Listener on port 7777 started
+[14:32:15] UDP Listener on port 6000 started
+[14:32:15] UDP Listener on port 6001 started
+
+All ports are now open. Press Ctrl+C or close window to stop.
 ```
 
-Key observations:
-- ? All ports have the same PID (same process)
-- ? Process name is "TestPortOpener" (not a system process)
-- ? Creation times are sorted (newest first)
-- ? Both TCP and UDP protocols appear
-- ? Process can be safely killed
+**Note**: Timestamps in brackets show when each port opened.
 
-## Troubleshooting
+### RBPortKiller Display
+
+Look for TestPortOpener entries in the port table:
+
+```
+#  Port  Protocol  PID    Process Name    Local Address    State        Created
+1  7777  TCP       5432   TestPortOpener  0.0.0.0:7777    LISTENING    14:32:15
+2  9000  TCP       5432   TestPortOpener  0.0.0.0:9000    LISTENING    14:32:15
+...
+```
+
+## Common Issues
 
 ### Port Already in Use
-```
-? TCP Port  3000 - FAILED: Only one usage of each socket address...
-```
 
-**Solution**: 
-- Close any other applications using these ports (Node.js, Docker, etc.)
-- Or modify the port numbers in the code
-
-### Permission Denied
-```
-Access to the path is denied
-```
+**Error**: `Port 3000 is already in use`
 
 **Solution**:
-- Run as Administrator (Windows)
-- Use `sudo` on Linux/Mac if ports < 1024
+- Another application is using that port
+- Close the other application first
+- Or use RBPortKiller to kill it
 
-### Ports Not Showing in RBPortKiller
-**Possible Causes**:
-1. TestPortOpener crashed - check if it's still running
-2. System process filter is working (good!) - verify "TestPortOpener" is the process name
-3. Run RBPortKiller as Administrator to see all process info
+### Permission Denied (Linux/Mac)
 
-### Can't Kill TestPortOpener
-**Check**:
-1. Are you running RBPortKiller as Administrator?
-2. Is TestPortOpener still running?
-3. Try pressing Ctrl+C in TestPortOpener window first
+**Error**: `Permission denied` when opening ports <1024
 
-## Customization
-
-### Add More Ports
-Edit `Program.cs` and add more listeners:
-
-```csharp
-StartTcpListener(YOUR_PORT, "Your Description");
-StartUdpListener(YOUR_PORT, "Your Description");
-```
-
-### Change Port Numbers
-Modify the port numbers in the `StartTcpListener()` and `StartUdpListener()` calls.
-
-### Add Delays
-In Advanced Mode, adjust the `Task.Delay()` values:
-
-```csharp
-await Task.Delay(2000); // Wait 2 seconds
-await Task.Delay(5000); // Wait 5 seconds
-```
-
-## Clean Up
-
-### Stop the Application
-- Press **Ctrl+C** in the terminal
-- Or kill it using RBPortKiller (that's the point!)
-
-### Verify Ports Are Closed
+**Solution**:
 ```bash
-# Windows
-netstat -ano | findstr "3000 5000 8080"
-
-# Linux/Mac
-netstat -tuln | grep "3000\|5000\|8080"
+sudo dotnet run --project TestPortOpener
 ```
 
-Should return no results when TestPortOpener is stopped.
+### TestPortOpener Not Appearing in RBPortKiller
 
-## Notes for Developers
+**Cause**: TestPortOpener not running or no ports opened
 
-### Why This Tool?
+**Solution**:
+- Verify TestPortOpener console shows "All ports are now open"
+- Check for error messages in TestPortOpener
+- Refresh port list in RBPortKiller
 
-Testing RBPortKiller requires:
-1. **Non-system processes** - TestPortOpener qualifies
-2. **Known port numbers** - Easy to identify
-3. **Persistent connections** - Stays open until killed
-4. **Safe to terminate** - No data loss risk
+## Advanced Usage
 
-### Architecture
+### Custom Ports
 
-```
-TestPortOpener/
-??? Program.cs                  # Main entry, simple mode
-??? AdvancedPortTester.cs      # Advanced scenarios
-??? TestPortOpener.csproj      # .NET 8 project
-```
-
-### Adding Test Scenarios
-
-Create a new test method in `AdvancedPortTester.cs`:
+Edit `TestPortOpener/Program.cs` to use different ports:
 
 ```csharp
-public static async Task RunCustomScenario()
+// Simple mode ports
+var simplePorts = new[]
 {
-    OpenPort(YOUR_PORT, "Custom Test");
-    await Task.Delay(YOUR_DELAY);
-    // More ports...
-}
+    (3000, ProtocolType.Tcp),
+    (5000, ProtocolType.Tcp),
+    // Add your ports here
+};
 ```
 
-Then call it from `Program.cs`.
+### Custom Timing
 
-## Safety Notice
+Edit staging delays in `AdvancedPortTester.cs`:
 
-?? **This is a test tool - not for production use!**
-
-- Opens ports without authentication
-- Accepts connections but doesn't validate them
-- No error recovery or logging
-- Designed to be killed easily
-
-Perfect for testing, **not** for real applications!
-
-## Integration with RBPortKiller
-
-This tool was designed specifically to test these RBPortKiller features:
-
-? **System Process Filtering** - TestPortOpener is a user app, not a system process  
-? **Creation Time Tracking** - Advanced mode creates ports at different times  
-? **Creation Time Sorting** - Verifies newest ports appear first  
-? **Process Termination** - Safe to kill, tests the core functionality  
-? **Multi-Protocol Support** - Tests both TCP and UDP  
-? **Port Discovery** - Creates various listener types  
-
-## Example Test Session
-
-```bash
-# Terminal 1: Start test ports
-> run-test-ports.bat
-Select test mode:
-  1. Simple Mode
-  2. Advanced Mode
-Enter choice (1 or 2): 2
-
-[Advanced test runs, opens ports in stages]
-
-# Terminal 2: Test RBPortKiller
-> cd RBPortKiller.CLI
-> dotnet run
-
-[See TestPortOpener ports in the list]
-[Verify creation times]
-[Verify sorting]
-[Kill the process]
-[Verify success]
-
-# Terminal 1: TestPortOpener should exit
-[Application terminated by RBPortKiller]
+```csharp
+await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);  // Change delay
 ```
 
-Perfect test! ?
+## Integration with CI/CD
+
+### Automated Testing Script
+
+```powershell
+# Start TestPortOpener in background
+Start-Process dotnet -ArgumentList "run --project TestPortOpener" -NoNewWindow
+
+# Wait for ports to open
+Start-Sleep -Seconds 2
+
+# Run RBPortKiller tests
+# (when test suite exists)
+
+# Cleanup: Kill TestPortOpener
+Get-Process -Name TestPortOpener | Stop-Process
+```
+
+## Files
+
+- `Program.cs`: Main entry point, mode selection
+- `AdvancedPortTester.cs`: Staged port opening logic
+- `README.md`: This file
+
+## Tips
+
+- Use **Simple Mode** for quick functional testing
+- Use **Advanced Mode** specifically for creation time sorting tests
+- Keep TestPortOpener running while testing RBPortKiller
+- TestPortOpener can run multiple instances for stress testing
+- Press Ctrl+C in TestPortOpener to cleanly close all ports
+
+## See Also
+
+- Main documentation: `README.md`
+- Usage guide: `Misc/Docs/USAGE.md`
+- Development guide: `Misc/Docs/DEVELOPMENT.md`
+- Architecture: `Misc/Docs/ARCHITECTURE.md`
