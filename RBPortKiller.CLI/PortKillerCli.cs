@@ -88,7 +88,7 @@ public sealed class PortKillerCli
             .Color(Color.Cyan1);
 
         AnsiConsole.Write(banner);
-        AnsiConsole.MarkupLine("[dim]A powerful CLI tool for managing network ports[/]\n");
+        AnsiConsole.MarkupLine("[dim]View and terminate processes by network port.[/]\n");
     }
 
     private async Task<List<PortInfo>> LoadPortsAsync()

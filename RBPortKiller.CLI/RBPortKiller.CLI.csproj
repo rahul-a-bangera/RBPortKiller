@@ -23,7 +23,7 @@
     <PackageId>RBPortKiller</PackageId>
     <Version>1.0.0</Version>
     <Authors>Rahul</Authors>
-    <Description>A powerful CLI tool for managing network ports and terminating processes</Description>
+    <Description>View and terminate processes by network port</Description>
     <PackageTags>cli;port;network;process;management</PackageTags>
     
     <!-- Publishing Configuration -->

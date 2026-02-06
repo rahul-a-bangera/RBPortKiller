@@ -2,4 +2,5 @@
   <Project Path="RBPortKiller.CLI/RBPortKiller.CLI.csproj" />
   <Project Path="RBPortKiller.Core/RBPortKiller.Core.csproj" />
   <Project Path="RBPortKiller.Infrastructure/RBPortKiller.Infrastructure.csproj" />
+  <Project Path="TestPortOpener/TestPortOpener.csproj" />
 </Solution>
