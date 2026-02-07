@@ -86,7 +86,7 @@ if not defined CURRENT_PATH (
 )
 
 REM Check if already in PATH
-echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
 if %errorLevel%==0 (
     echo [INFO] RBPortKiller is already in system PATH
     echo [SUCCESS] Installation verified!
@@ -131,7 +131,7 @@ REM If user PATH doesn't exist, create it empty
 if not defined CURRENT_PATH set "CURRENT_PATH="
 
 REM Check if already in PATH
-echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
 if %errorLevel%==0 (
     echo [INFO] RBPortKiller is already in user PATH
     echo [SUCCESS] Installation verified!

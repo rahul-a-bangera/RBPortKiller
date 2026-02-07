@@ -66,7 +66,7 @@ if not defined CURRENT_PATH (
 )
 
 REM Check if installation directory is in PATH
-echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
 if %errorLevel% neq 0 (
     echo [INFO] RBPortKiller is not in system PATH
     echo [INFO] Nothing to uninstall from system PATH
@@ -136,7 +136,7 @@ if not defined CURRENT_PATH (
 )
 
 REM Check if installation directory is in PATH
-echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
 if %errorLevel% neq 0 (
     echo [INFO] RBPortKiller is not in user PATH
     echo [INFO] Nothing to uninstall from user PATH
@@ -209,7 +209,7 @@ if not defined CURRENT_PATH (
     goto UNINSTALL_COMPLETE
 )
 
-echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
 if %errorLevel% neq 0 (
     echo [INFO] Not found in user PATH either
     echo [SUCCESS] RBPortKiller is not installed
