@@ -95,14 +95,29 @@ if "%CHECK_RESULT%"=="0" (
 
 REM Add to system PATH
 echo Adding to system PATH...
-setx PATH "%CURRENT_PATH%;%INSTALL_DIR%" /M >nul 2>&1
-set SETX_RESULT=%errorLevel%
+
+REM Check if new PATH would exceed setx limit (1024 chars)
+set "NEW_PATH=%CURRENT_PATH%;%INSTALL_DIR%"
+call :strlen NEW_PATH NEW_PATH_LEN
+
+if %NEW_PATH_LEN% GTR 1024 (
+    echo [WARN] PATH is too long for setx command (over 1024 characters)
+    echo [INFO] Using PowerShell method instead...
+    
+    REM Use PowerShell to write directly to registry
+    powershell -Command "[Environment]::SetEnvironmentVariable('Path', '%NEW_PATH%', 'Machine')" >nul 2>&1
+    set SETX_RESULT=%errorLevel%
+) else (
+    REM Use setx for shorter paths
+    setx PATH "%NEW_PATH%" /M >nul 2>&1
+    set SETX_RESULT=%errorLevel%
+)
 
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully added to system PATH!
     echo.
     REM Refresh PATH for current session
-    set "PATH=%CURRENT_PATH%;%INSTALL_DIR%"
+    set "PATH=%NEW_PATH%"
     echo [INFO] PATH refreshed for current session
     echo.
     echo To use in NEW windows: Close and reopen your Command Prompt/PowerShell
@@ -145,18 +160,39 @@ if "%CHECK_RESULT%"=="0" (
 
 REM Add to user PATH
 echo Adding to user PATH...
+
+REM Build new PATH
 if defined CURRENT_PATH (
-    setx PATH "%CURRENT_PATH%;%INSTALL_DIR%" >nul 2>&1
+    set "NEW_PATH=%CURRENT_PATH%;%INSTALL_DIR%"
 ) else (
-    setx PATH "%INSTALL_DIR%" >nul 2>&1
+    set "NEW_PATH=%INSTALL_DIR%"
 )
-set SETX_RESULT=%errorLevel%
+
+REM Check if new PATH would exceed setx limit (1024 chars)
+call :strlen NEW_PATH NEW_PATH_LEN
+
+if %NEW_PATH_LEN% GTR 1024 (
+    echo [WARN] PATH is too long for setx command (over 1024 characters)
+    echo [INFO] Using PowerShell method instead...
+    
+    REM Use PowerShell to write directly to registry
+    powershell -Command "[Environment]::SetEnvironmentVariable('Path', '%NEW_PATH%', 'User')" >nul 2>&1
+    set SETX_RESULT=%errorLevel%
+) else (
+    REM Use setx for shorter paths
+    setx PATH "%NEW_PATH%" >nul 2>&1
+    set SETX_RESULT=%errorLevel%
+)
 
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully added to user PATH!
     echo.
-    echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
-    echo            for changes to take effect.
+    REM Refresh PATH for current session
+    set "PATH=%NEW_PATH%"
+    echo [INFO] PATH refreshed for current session
+    echo.
+    echo To use in NEW windows: Close and reopen your Command Prompt/PowerShell
+    echo To use NOW in THIS window: The PATH has been updated for this session
     goto INSTALL_COMPLETE
 ) else (
     echo [ERROR] Failed to update user PATH
@@ -186,3 +222,18 @@ echo.
 echo Press any key to exit...
 pause >nul
 exit /b 0
+
+:strlen
+REM Helper function to get string length
+REM Usage: call :strlen VAR_NAME RESULT_VAR
+setlocal enabledelayedexpansion
+set "str=!%~1!"
+set "len=0"
+:strlen_loop
+if defined str (
+    set "str=!str:~1!"
+    set /a len+=1
+    goto :strlen_loop
+)
+endlocal & set "%~2=%len%"
+exit /b

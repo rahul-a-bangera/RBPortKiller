@@ -93,10 +93,19 @@ for %%p in ("%CURRENT_PATH:;=" "%") do (
 )
 
 REM Update registry
-setx PATH "%NEW_PATH%" /M >nul 2>&1
-set SETX_RESULT=%errorLevel%
-
 endlocal & set "NEW_PATH=%NEW_PATH%"
+
+REM Check if new PATH would exceed setx limit (1024 chars)
+call :strlen NEW_PATH NEW_PATH_LEN
+
+if %NEW_PATH_LEN% GTR 1024 (
+    echo [INFO] Using PowerShell method for long PATH...
+    powershell -Command "[Environment]::SetEnvironmentVariable('Path', '%NEW_PATH%', 'Machine')" >nul 2>&1
+    set SETX_RESULT=%errorLevel%
+) else (
+    setx PATH "%NEW_PATH%" /M >nul 2>&1
+    set SETX_RESULT=%errorLevel%
+)
 
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from system PATH!
@@ -168,21 +177,39 @@ for %%p in ("%CURRENT_PATH:;=" "%") do (
 )
 
 REM Update registry
+endlocal & set "NEW_PATH=%NEW_PATH%"
+
+REM Check if new PATH would exceed setx limit (1024 chars)
+call :strlen NEW_PATH NEW_PATH_LEN
+
 if defined NEW_PATH (
-    setx PATH "%NEW_PATH%" >nul 2>&1
+    if %NEW_PATH_LEN% GTR 1024 (
+        echo [INFO] Using PowerShell method for long PATH...
+        powershell -Command "[Environment]::SetEnvironmentVariable('Path', '%NEW_PATH%', 'User')" >nul 2>&1
+        set SETX_RESULT=%errorLevel%
+    ) else (
+        setx PATH "%NEW_PATH%" >nul 2>&1
+        set SETX_RESULT=%errorLevel%
+    )
 ) else (
     REM If PATH would be empty, set it to empty string
     setx PATH "" >nul 2>&1
+    set SETX_RESULT=%errorLevel%
 )
-set SETX_RESULT=%errorLevel%
-
-endlocal & set "NEW_PATH=%NEW_PATH%"
 
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from user PATH!
     echo.
-    echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
-    echo            for changes to take effect.
+    REM Refresh PATH for current session
+    if defined NEW_PATH (
+        set "PATH=%NEW_PATH%"
+    ) else (
+        set "PATH="
+    )
+    echo [INFO] PATH refreshed for current session
+    echo.
+    echo To apply in NEW windows: Close and reopen your Command Prompt/PowerShell
+    echo In THIS window: The PATH has been updated for this session
     goto UNINSTALL_COMPLETE
 ) else (
     echo [ERROR] Failed to update user PATH
@@ -254,14 +281,24 @@ for %%p in ("%CURRENT_PATH:;=" "%") do (
     )
 )
 
+endlocal & set "NEW_PATH=%NEW_PATH%"
+
+REM Check if new PATH would exceed setx limit (1024 chars)
+call :strlen NEW_PATH NEW_PATH_LEN
+
 if defined NEW_PATH (
-    setx PATH "%NEW_PATH%" >nul 2>&1
+    if %NEW_PATH_LEN% GTR 1024 (
+        echo [INFO] Using PowerShell method for long PATH...
+        powershell -Command "[Environment]::SetEnvironmentVariable('Path', '%NEW_PATH%', 'User')" >nul 2>&1
+        set SETX_RESULT=%errorLevel%
+    ) else (
+        setx PATH "%NEW_PATH%" >nul 2>&1
+        set SETX_RESULT=%errorLevel%
+    )
 ) else (
     setx PATH "" >nul 2>&1
+    set SETX_RESULT=%errorLevel%
 )
-set SETX_RESULT=%errorLevel%
-
-endlocal & set "NEW_PATH=%NEW_PATH%"
 
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from user PATH!
@@ -288,3 +325,18 @@ echo.
 echo Press any key to exit...
 pause >nul
 exit /b 0
+
+:strlen
+REM Helper function to get string length
+REM Usage: call :strlen VAR_NAME RESULT_VAR
+setlocal enabledelayedexpansion
+set "str=!%~1!"
+set "len=0"
+:strlen_loop
+if defined str (
+    set "str=!str:~1!"
+    set /a len+=1
+    goto :strlen_loop
+)
+endlocal & set "%~2=%len%"
+exit /b
