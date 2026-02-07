@@ -10,14 +10,17 @@ Identify which programs are using specific ports and terminate them.
 INSTALLATION
 ------------
 Automatic Setup (Recommended):
-  1. Run: .\install.ps1 in PowerShell
-     (Right-click PowerShell > "Run as Administrator" for system-wide install)
-  2. Restart your command prompt/PowerShell
+  - Double-click: install.bat
+    (Right-click > "Run as Administrator" for system-wide install)
+  
+  After installation:
+  1. Close the installer window
+  2. Open a NEW Command Prompt or PowerShell
   3. Type 'rbportkiller' from any directory
 
 Manual Setup:
   - Run directly: .\rbportkiller.exe
-  - Or add this folder to your system PATH
+  - Or add this folder to your system PATH manually
 
 USAGE
 -----

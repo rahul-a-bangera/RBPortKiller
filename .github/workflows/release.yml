@@ -107,10 +107,10 @@ jobs:
         
       - name: Copy installation files
         run: |
-          Copy-Item "RBPortKiller.CLI\install.ps1" -Destination ".\publish\win-x64\"
+          Copy-Item "RBPortKiller.CLI\install.bat" -Destination ".\publish\win-x64\"
           Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\win-x64\"
           
-          Copy-Item "RBPortKiller.CLI\install.ps1" -Destination ".\publish\win-x86\"
+          Copy-Item "RBPortKiller.CLI\install.bat" -Destination ".\publish\win-x86\"
           Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\win-x86\"
         
       - name: Create ZIP Archives
@@ -150,9 +150,9 @@ jobs:
           
           1. Download the appropriate ZIP file for your system from the Assets section below
           2. Extract the ZIP file to your desired location
-          3. Run the PowerShell installer: ``.\install.ps1``
-             - For system-wide install: Right-click PowerShell > "Run as Administrator" then run the script
-          4. Restart your command prompt/PowerShell
+          3. Double-click: ``install.bat``
+             - For system-wide install: Right-click ``install.bat`` > "Run as Administrator"
+          4. Open a NEW Command Prompt or PowerShell
           5. Type ``rbportkiller`` from any directory to launch the tool
           
           **Manual**: Run ``rbportkiller.exe`` directly or add the folder to your PATH. See ``README.txt`` for details.

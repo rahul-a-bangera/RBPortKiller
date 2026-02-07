@@ -120,7 +120,7 @@ foreach ($platform in $platforms) {
 Write-Host "[7/9] Copying installation files..." -ForegroundColor Cyan
 
 foreach ($platform in $platforms) {
-    Copy-Item "RBPortKiller.CLI\install.ps1" -Destination ".\publish\$($platform.Runtime)\" -Force
+    Copy-Item "RBPortKiller.CLI\install.bat" -Destination ".\publish\$($platform.Runtime)\" -Force
     Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\$($platform.Runtime)\" -Force
 }
 
