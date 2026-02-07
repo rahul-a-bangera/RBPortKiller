@@ -167,14 +167,6 @@ jobs:
           
           $notes | Out-File -FilePath release_notes.md -Encoding utf8
           
-      - name: Create git tag
-        run: |
-          $version = "${{ needs.check-version.outputs.version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v$version" -m "Release v$version"
-          git push origin "v$version"
-          
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
