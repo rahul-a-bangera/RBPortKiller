@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+REM Disable command echoing and enable error handling
 
 REM ============================================================================
 REM RBPortKiller Installation Script
@@ -14,7 +14,8 @@ echo.
 
 REM Get installation directory (where this batch file is located)
 set "INSTALL_DIR=%~dp0"
-set "INSTALL_DIR=%INSTALL_DIR:~0,-1%"
+REM Remove trailing backslash
+if "%INSTALL_DIR:~-1%"=="\" set "INSTALL_DIR=%INSTALL_DIR:~0,-1%"
 
 echo Installing from: %INSTALL_DIR%
 echo.
@@ -23,15 +24,22 @@ REM Verify rbportkiller.exe exists
 if not exist "%INSTALL_DIR%\rbportkiller.exe" (
     echo [ERROR] rbportkiller.exe not found in installation directory!
     echo.
+    echo Current directory: %INSTALL_DIR%
+    echo.
     echo Please ensure you extracted the ZIP file correctly.
     echo.
     pause
     exit /b 1
 )
 
+echo [INFO] Found rbportkiller.exe
+echo.
+
 REM Check for administrator privileges
 net session >nul 2>&1
-if %errorLevel% == 0 (
+set ADMIN_CHECK=%errorLevel%
+
+if %ADMIN_CHECK%==0 (
     set "IS_ADMIN=1"
     echo [INFO] Running with administrator privileges
     echo [INFO] Adding to SYSTEM PATH (all users)...
@@ -40,7 +48,7 @@ if %errorLevel% == 0 (
     echo [WARN] Not running as administrator
     echo [INFO] Adding to USER PATH (current user only)...
     echo.
-    echo To install system-wide: Right-click install.bat ^> Run as administrator
+    echo To install system-wide: Right-click install.bat and select "Run as administrator"
 )
 echo.
 
@@ -48,70 +56,106 @@ REM ============================================================================
 REM ADD TO PATH
 REM ============================================================================
 
-if "%IS_ADMIN%"=="1" (
-    REM ===== SYSTEM PATH (ADMIN) =====
-    echo Checking system PATH...
-    
-    REM Read current system PATH
-    for /f "tokens=2*" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path 2^>nul') do set "SYSTEM_PATH=%%b"
-    
-    REM Check if already in PATH
-    echo !SYSTEM_PATH! | findstr /i /c:"%INSTALL_DIR%" >nul
-    if !errorLevel! == 0 (
-        echo [INFO] RBPortKiller is already in system PATH
-        echo [SUCCESS] Installation verified!
-    ) else (
-        REM Add to system PATH
-        echo Adding to system PATH...
-        setx PATH "%SYSTEM_PATH%;%INSTALL_DIR%" /M >nul 2>&1
-        
-        if !errorLevel! == 0 (
-            echo [SUCCESS] Successfully added to system PATH!
-            echo.
-            echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
-            echo            for changes to take effect.
-        ) else (
-            echo [ERROR] Failed to update system PATH
-            echo [ERROR] Error code: !errorLevel!
-            echo.
-            echo Try running as administrator or use manual setup.
-            pause
-            exit /b 1
-        )
-    )
-) else (
-    REM ===== USER PATH (NON-ADMIN) =====
-    echo Checking user PATH...
-    
-    REM Read current user PATH
-    for /f "tokens=2*" %%a in ('reg query "HKCU\Environment" /v Path 2^>nul') do set "USER_PATH=%%b"
-    
-    REM Check if already in PATH
-    echo !USER_PATH! | findstr /i /c:"%INSTALL_DIR%" >nul
-    if !errorLevel! == 0 (
-        echo [INFO] RBPortKiller is already in user PATH
-        echo [SUCCESS] Installation verified!
-    ) else (
-        REM Add to user PATH
-        echo Adding to user PATH...
-        setx PATH "%USER_PATH%;%INSTALL_DIR%" >nul 2>&1
-        
-        if !errorLevel! == 0 (
-            echo [SUCCESS] Successfully added to user PATH!
-            echo.
-            echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
-            echo            for changes to take effect.
-        ) else (
-            echo [ERROR] Failed to update user PATH
-            echo [ERROR] Error code: !errorLevel!
-            echo.
-            echo Try manual setup or contact support.
-            pause
-            exit /b 1
-        )
-    )
+if "%IS_ADMIN%"=="1" goto ADMIN_INSTALL
+goto USER_INSTALL
+
+:ADMIN_INSTALL
+REM ===== SYSTEM PATH (ADMIN) =====
+echo Checking system PATH...
+echo.
+
+REM Read current system PATH from registry
+for /f "skip=2 tokens=2*" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path 2^>nul') do set "CURRENT_PATH=%%b"
+
+if not defined CURRENT_PATH (
+    echo [ERROR] Could not read system PATH from registry
+    echo.
+    pause
+    exit /b 1
 )
 
+REM Check if already in PATH
+echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+if %errorLevel%==0 (
+    echo [INFO] RBPortKiller is already in system PATH
+    echo [SUCCESS] Installation verified!
+    goto INSTALL_COMPLETE
+)
+
+REM Add to system PATH
+echo Adding to system PATH...
+setx PATH "%CURRENT_PATH%;%INSTALL_DIR%" /M >nul 2>&1
+set SETX_RESULT=%errorLevel%
+
+if %SETX_RESULT%==0 (
+    echo [SUCCESS] Successfully added to system PATH!
+    echo.
+    echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
+    echo            for changes to take effect.
+    goto INSTALL_COMPLETE
+) else (
+    echo [ERROR] Failed to update system PATH
+    echo [ERROR] Error code: %SETX_RESULT%
+    echo.
+    echo Possible causes:
+    echo  - PATH variable is too long (max 2047 characters)
+    echo  - Insufficient permissions
+    echo.
+    echo Try manual setup or contact support.
+    echo.
+    pause
+    exit /b 1
+)
+
+:USER_INSTALL
+REM ===== USER PATH (NON-ADMIN) =====
+echo Checking user PATH...
+echo.
+
+REM Read current user PATH from registry
+for /f "skip=2 tokens=2*" %%a in ('reg query "HKCU\Environment" /v Path 2^>nul') do set "CURRENT_PATH=%%b"
+
+REM If user PATH doesn't exist, create it empty
+if not defined CURRENT_PATH set "CURRENT_PATH="
+
+REM Check if already in PATH
+echo %CURRENT_PATH% | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+if %errorLevel%==0 (
+    echo [INFO] RBPortKiller is already in user PATH
+    echo [SUCCESS] Installation verified!
+    goto INSTALL_COMPLETE
+)
+
+REM Add to user PATH
+echo Adding to user PATH...
+if defined CURRENT_PATH (
+    setx PATH "%CURRENT_PATH%;%INSTALL_DIR%" >nul 2>&1
+) else (
+    setx PATH "%INSTALL_DIR%" >nul 2>&1
+)
+set SETX_RESULT=%errorLevel%
+
+if %SETX_RESULT%==0 (
+    echo [SUCCESS] Successfully added to user PATH!
+    echo.
+    echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
+    echo            for changes to take effect.
+    goto INSTALL_COMPLETE
+) else (
+    echo [ERROR] Failed to update user PATH
+    echo [ERROR] Error code: %SETX_RESULT%
+    echo.
+    echo Possible causes:
+    echo  - PATH variable is too long (max 2047 characters)
+    echo  - Registry access issues
+    echo.
+    echo Try manual setup or contact support.
+    echo.
+    pause
+    exit /b 1
+)
+
+:INSTALL_COMPLETE
 REM ============================================================================
 REM INSTALLATION COMPLETE
 REM ============================================================================
