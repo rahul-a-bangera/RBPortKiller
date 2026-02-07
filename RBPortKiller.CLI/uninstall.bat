@@ -2,7 +2,6 @@
 REM Force window to stay open on any error
 if not "%1"=="noerror" (
     cmd /c "%~f0" noerror %*
-    pause
     exit /b
 )
 
@@ -29,14 +28,14 @@ REM Check for administrator privileges
 net session >nul 2>&1
 set ADMIN_CHECK=%errorLevel%
 
-if %ADMIN_CHECK%==0 (
+if "%ADMIN_CHECK%"=="0" (
     set "IS_ADMIN=1"
     echo [INFO] Running with administrator privileges
-    echo [INFO] Removing from SYSTEM PATH (all users)...
+    echo [INFO] Removing from SYSTEM PATH ^(all users^)...
 ) else (
     set "IS_ADMIN=0"
     echo [WARN] Not running as administrator
-    echo [INFO] Removing from USER PATH (current user only)...
+    echo [INFO] Removing from USER PATH ^(current user only^)...
     echo.
     echo To uninstall system-wide: Right-click uninstall.bat and select "Run as administrator"
 )
@@ -66,8 +65,9 @@ if not defined CURRENT_PATH (
 )
 
 REM Check if installation directory is in PATH
-echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
-if %errorLevel% neq 0 (
+echo "%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+set CHECK_RESULT=%errorLevel%
+if "%CHECK_RESULT%" neq "0" (
     echo [INFO] RBPortKiller is not in system PATH
     echo [INFO] Nothing to uninstall from system PATH
     goto CHECK_USER_PATH
@@ -98,7 +98,7 @@ set SETX_RESULT=%errorLevel%
 
 endlocal & set "NEW_PATH=%NEW_PATH%"
 
-if %SETX_RESULT%==0 (
+if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from system PATH!
     echo.
     echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
@@ -136,8 +136,9 @@ if not defined CURRENT_PATH (
 )
 
 REM Check if installation directory is in PATH
-echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
-if %errorLevel% neq 0 (
+echo "%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+set CHECK_RESULT=%errorLevel%
+if "%CHECK_RESULT%" neq "0" (
     echo [INFO] RBPortKiller is not in user PATH
     echo [INFO] Nothing to uninstall from user PATH
     goto CHECK_SYSTEM_PATH
@@ -173,7 +174,7 @@ set SETX_RESULT=%errorLevel%
 
 endlocal & set "NEW_PATH=%NEW_PATH%"
 
-if %SETX_RESULT%==0 (
+if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from user PATH!
     echo.
     echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
@@ -209,8 +210,9 @@ if not defined CURRENT_PATH (
     goto UNINSTALL_COMPLETE
 )
 
-echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
-if %errorLevel% neq 0 (
+echo "%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+set CHECK_RESULT=%errorLevel%
+if "%CHECK_RESULT%" neq "0" (
     echo [INFO] Not found in user PATH either
     echo [SUCCESS] RBPortKiller is not installed
     goto UNINSTALL_COMPLETE
@@ -257,7 +259,7 @@ set SETX_RESULT=%errorLevel%
 
 endlocal & set "NEW_PATH=%NEW_PATH%"
 
-if %SETX_RESULT%==0 (
+if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from user PATH!
     goto UNINSTALL_COMPLETE
 ) else (
@@ -278,17 +280,6 @@ echo.
 echo ====================================
 echo    Uninstallation Complete!
 echo ====================================
-echo.
-echo RBPortKiller has been removed from PATH.
-echo.
-echo The executable files have NOT been deleted.
-echo If you want to completely remove RBPortKiller:
-echo   1. Close this window
-echo   2. Delete the installation folder: %INSTALL_DIR%
-echo.
-echo To reinstall later, extract the ZIP and run install.bat
-echo.
-echo Support: https://github.com/rahul-a-bangera/RBPortKiller
 echo.
 echo Press any key to exit...
 pause >nul

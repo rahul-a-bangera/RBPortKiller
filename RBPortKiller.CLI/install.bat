@@ -2,7 +2,6 @@
 REM Force window to stay open on any error
 if not "%1"=="noerror" (
     cmd /c "%~f0" noerror %*
-    pause
     exit /b
 )
 
@@ -49,14 +48,14 @@ REM Check for administrator privileges
 net session >nul 2>&1
 set ADMIN_CHECK=%errorLevel%
 
-if %ADMIN_CHECK%==0 (
+if "%ADMIN_CHECK%"=="0" (
     set "IS_ADMIN=1"
     echo [INFO] Running with administrator privileges
-    echo [INFO] Adding to SYSTEM PATH (all users)...
+    echo [INFO] Adding to SYSTEM PATH ^(all users^)...
 ) else (
     set "IS_ADMIN=0"
     echo [WARN] Not running as administrator
-    echo [INFO] Adding to USER PATH (current user only)...
+    echo [INFO] Adding to USER PATH ^(current user only^)...
     echo.
     echo To install system-wide: Right-click install.bat and select "Run as administrator"
 )
@@ -86,8 +85,9 @@ if not defined CURRENT_PATH (
 )
 
 REM Check if already in PATH
-echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
-if %errorLevel%==0 (
+echo "%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+set CHECK_RESULT=%errorLevel%
+if "%CHECK_RESULT%"=="0" (
     echo [INFO] RBPortKiller is already in system PATH
     echo [SUCCESS] Installation verified!
     goto INSTALL_COMPLETE
@@ -98,7 +98,7 @@ echo Adding to system PATH...
 setx PATH "%CURRENT_PATH%;%INSTALL_DIR%" /M >nul 2>&1
 set SETX_RESULT=%errorLevel%
 
-if %SETX_RESULT%==0 (
+if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully added to system PATH!
     echo.
     echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
@@ -131,8 +131,9 @@ REM If user PATH doesn't exist, create it empty
 if not defined CURRENT_PATH set "CURRENT_PATH="
 
 REM Check if already in PATH
-echo."%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
-if %errorLevel%==0 (
+echo "%CURRENT_PATH%" | findstr /i /c:"%INSTALL_DIR%" >nul 2>&1
+set CHECK_RESULT=%errorLevel%
+if "%CHECK_RESULT%"=="0" (
     echo [INFO] RBPortKiller is already in user PATH
     echo [SUCCESS] Installation verified!
     goto INSTALL_COMPLETE
@@ -147,7 +148,7 @@ if defined CURRENT_PATH (
 )
 set SETX_RESULT=%errorLevel%
 
-if %SETX_RESULT%==0 (
+if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully added to user PATH!
     echo.
     echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
@@ -177,15 +178,6 @@ echo.
 echo ====================================
 echo    Installation Complete!
 echo ====================================
-echo.
-echo Usage: Type 'rbportkiller' in any Command Prompt or PowerShell window
-echo.
-echo Next steps:
-echo   1. Close this window
-echo   2. Open a NEW Command Prompt or PowerShell
-echo   3. Type: rbportkiller
-echo.
-echo Support: https://github.com/rahul-a-bangera/RBPortKiller
 echo.
 echo Press any key to exit...
 pause >nul
