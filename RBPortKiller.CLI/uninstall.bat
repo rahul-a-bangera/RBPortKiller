@@ -301,8 +301,19 @@ if defined NEW_PATH (
 )
 
 if "%SETX_RESULT%"=="0" (
-    echo [SUCCESS] Successfully removed from user PATH!
-    goto UNINSTALL_COMPLETE
+echo [SUCCESS] Successfully removed from user PATH!
+echo.
+REM Refresh PATH for current session
+if defined NEW_PATH (
+    set "PATH=%NEW_PATH%"
+) else (
+    set "PATH="
+)
+echo [INFO] PATH refreshed for current session
+echo.
+echo To apply in NEW windows: Close and reopen your Command Prompt/PowerShell
+echo In THIS window: The PATH has been updated for this session
+goto UNINSTALL_COMPLETE
 ) else (
     echo [ERROR] Failed to update user PATH
     echo [ERROR] Error code: %SETX_RESULT%
