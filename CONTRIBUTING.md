@@ -19,11 +19,10 @@ Thank you for your interest in contributing to RBPortKiller!
 - Add XML documentation for public APIs
 - One class per file
 - Constructor injection for dependencies
-- No emojis or em dashes in code or documentation
 
 ## Documentation
 
-All documentation files must be placed in `Misc/Docs/` directory (never in project root or source directories).
+**IMPORTANT:** All documentation files must be placed in `Misc/Docs/` directory (never in project root or source directories, except README.md in project root).
 
 ## Testing
 

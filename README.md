@@ -9,7 +9,7 @@ A command-line tool for managing network ports and terminating processes on Wind
 ## Features
 
 - Interactive terminal interface powered by Spectre.Console
-- Real-time port discovery with detailed connection information
+- Real-time port discovery with detailed connection information on Windows
 - Process termination with permission validation
 - System process protection prevents accidental termination of critical processes
 - Port creation timestamps with intelligent sorting (newest first)
@@ -17,7 +17,7 @@ A command-line tool for managing network ports and terminating processes on Wind
 - Port list refresh without restarting the application
 - Color-coded connection states for easy visualization
 - Clean architecture with SOLID principles
-- Self-contained single binary executable
+- Self-contained single binary executable for Windows
 
 ## What You Get
 
@@ -118,12 +118,12 @@ The project follows clean architecture principles with clear separation of conce
 
 ```
 RBPortKiller/
-├── RBPortKiller.Core/              # Platform-agnostic business logic
+├── RBPortKiller.Core/              # Business logic and abstractions
 │   ├── Models/                     # Domain models (PortInfo, Protocol)
 │   ├── Interfaces/                 # Service abstractions
 │   └── Services/                   # Core business services
 │
-├── RBPortKiller.Infrastructure/    # Platform-specific implementations
+├── RBPortKiller.Infrastructure/    # Windows-specific implementations
 │   ├── Windows/                    # Windows implementation
 │   │   ├── Commands/               # Command executors
 │   │   ├── Parsers/                # Output parsers
@@ -207,12 +207,9 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Platform Support
 
-Currently supports Windows 10/11 and Windows Server 2016+.
+**Currently supports:** Windows 10/11 and Windows Server 2016+
 
-The architecture is designed for easy extension to Linux and macOS. To add support:
-1. Create platform-specific implementations of `IPortDiscoveryService` and `IProcessManagementService`
-2. Update `PlatformServiceFactory` to detect and return the new implementations
-3. Test on the target platform
+This tool is designed specifically for Windows and uses Windows-specific commands (netstat) for port discovery and process management.
 
 ## Acknowledgments
 

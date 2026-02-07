@@ -16,24 +16,39 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     
-    <!-- Tool Configuration -->
+    <!-- Assembly Information -->
     <AssemblyName>rbportkiller</AssemblyName>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Authors>Rahul Bangera</Authors>
+    <Company>Rahul Bangera</Company>
+    <Product>RBPortKiller</Product>
+    <Copyright>Copyright (c) 2025 Rahul Bangera</Copyright>
+    <Description>Cross-platform CLI tool for viewing and managing network ports and processes</Description>
+    
+    <!-- Application Icon -->
+    <ApplicationIcon>RBPortKillerLogo.ico</ApplicationIcon>
+    
+    <!-- NuGet Package Configuration -->
+    <PackageId>RBPortKiller</PackageId>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>rbportkiller</ToolCommandName>
-    <PackageId>RBPortKiller</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>Rahul</Authors>
-    <Description>View and terminate processes by network port</Description>
-    <PackageTags>cli;port;network;process;management</PackageTags>
+    <PackageTags>cli;port;network;process;management;netstat;cross-platform</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/rahul-a-bangera/RBPortKiller</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/rahul-a-bangera/RBPortKiller</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     
     <!-- Publishing Configuration -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
 </Project>
