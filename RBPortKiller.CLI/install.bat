@@ -1,5 +1,10 @@
 @echo off
-REM Disable command echoing and enable error handling
+REM Force window to stay open on any error
+if not "%1"=="noerror" (
+    cmd /c "%~f0" noerror %*
+    pause
+    exit /b
+)
 
 REM ============================================================================
 REM RBPortKiller Installation Script
@@ -26,9 +31,14 @@ if not exist "%INSTALL_DIR%\rbportkiller.exe" (
     echo.
     echo Current directory: %INSTALL_DIR%
     echo.
-    echo Please ensure you extracted the ZIP file correctly.
+    echo Files in directory:
+    dir "%INSTALL_DIR%" /b
     echo.
-    pause
+    echo Please ensure you extracted the ZIP file correctly.
+    echo This installer must be run from the same folder as rbportkiller.exe
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -70,7 +80,8 @@ for /f "skip=2 tokens=2*" %%a in ('reg query "HKLM\SYSTEM\CurrentControlSet\Cont
 if not defined CURRENT_PATH (
     echo [ERROR] Could not read system PATH from registry
     echo.
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -103,7 +114,8 @@ if %SETX_RESULT%==0 (
     echo.
     echo Try manual setup or contact support.
     echo.
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -151,7 +163,8 @@ if %SETX_RESULT%==0 (
     echo.
     echo Try manual setup or contact support.
     echo.
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -174,5 +187,6 @@ echo   3. Type: rbportkiller
 echo.
 echo Support: https://github.com/rahul-a-bangera/RBPortKiller
 echo.
-pause
+echo Press any key to exit...
+pause >nul
 exit /b 0
