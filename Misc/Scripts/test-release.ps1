@@ -121,6 +121,7 @@ Write-Host "[7/9] Copying installation files..." -ForegroundColor Cyan
 
 foreach ($platform in $platforms) {
     Copy-Item "RBPortKiller.CLI\install.bat" -Destination ".\publish\$($platform.Runtime)\" -Force
+    Copy-Item "RBPortKiller.CLI\uninstall.bat" -Destination ".\publish\$($platform.Runtime)\" -Force
     Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\$($platform.Runtime)\" -Force
 }
 
@@ -128,7 +129,7 @@ foreach ($platform in $platforms) {
 Write-Host "[8/9] Creating ZIP archives..." -ForegroundColor Cyan
 
 foreach ($platform in $platforms) {
-    $zipName = "rbportkiller-$($platform.Runtime).zip"
+    $zipName = if ($platform.Runtime -eq "win-x64") { "rbportkillerwin64.zip" } else { "rbportkillerwin86.zip" }
     Compress-Archive -Path ".\publish\$($platform.Runtime)\*" `
         -DestinationPath ".\release-test\$zipName" `
         -Force

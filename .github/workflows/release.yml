@@ -108,15 +108,17 @@ jobs:
       - name: Copy installation files
         run: |
           Copy-Item "RBPortKiller.CLI\install.bat" -Destination ".\publish\win-x64\"
+          Copy-Item "RBPortKiller.CLI\uninstall.bat" -Destination ".\publish\win-x64\"
           Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\win-x64\"
           
           Copy-Item "RBPortKiller.CLI\install.bat" -Destination ".\publish\win-x86\"
+          Copy-Item "RBPortKiller.CLI\uninstall.bat" -Destination ".\publish\win-x86\"
           Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\win-x86\"
         
       - name: Create ZIP Archives
         run: |
-          Compress-Archive -Path .\publish\win-x64\* -DestinationPath .\rbportkiller-win-x64.zip
-          Compress-Archive -Path .\publish\win-x86\* -DestinationPath .\rbportkiller-win-x86.zip
+          Compress-Archive -Path .\publish\win-x64\* -DestinationPath .\rbportkillerwin64.zip
+          Compress-Archive -Path .\publish\win-x86\* -DestinationPath .\rbportkillerwin86.zip
           
       - name: Calculate checksums
         id: checksums
@@ -124,8 +126,8 @@ jobs:
           $checksums = @()
           
           $files = @(
-            "rbportkiller-win-x64.zip",
-            "rbportkiller-win-x86.zip"
+            "rbportkillerwin64.zip",
+            "rbportkillerwin86.zip"
           )
           
           foreach ($file in $files) {
@@ -167,8 +169,8 @@ jobs:
           name: RBPortKiller v${{ needs.check-version.outputs.version }}
           body_path: release_notes.md
           files: |
-            rbportkiller-win-x64.zip
-            rbportkiller-win-x86.zip
+            rbportkillerwin64.zip
+            rbportkillerwin86.zip
             checksums.txt
           draft: false
           prerelease: false

@@ -30,8 +30,8 @@ Releases are triggered automatically when the version in `RBPortKiller.CLI/RBPor
 
 ## What Gets Built
 
-- `rbportkiller-win-x64.zip` (Windows 64-bit)
-- `rbportkiller-win-x86.zip` (Windows 32-bit)
+- `rbportkillerwin64.zip` (Windows 64-bit)
+- `rbportkillerwin86.zip` (Windows 32-bit)
 - `checksums.txt` (SHA256)
 
 ## Troubleshooting
