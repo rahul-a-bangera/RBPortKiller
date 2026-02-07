@@ -18,8 +18,18 @@ echo.
 
 REM Get installation directory (where this batch file is located)
 set "INSTALL_DIR=%~dp0"
+
+echo [DEBUG] Raw %%~dp0 = %INSTALL_DIR%
+echo.
+
 REM Remove trailing backslash
 if "%INSTALL_DIR:~-1%"=="\" set "INSTALL_DIR=%INSTALL_DIR:~0,-1%"
+
+echo [DEBUG] After backslash removal = %INSTALL_DIR%
+echo [DEBUG] Length check...
+call :strlen INSTALL_DIR INSTALL_DIR_LEN
+echo [DEBUG] INSTALL_DIR length = %INSTALL_DIR_LEN% characters
+echo.
 
 echo Installing from: %INSTALL_DIR%
 echo.
@@ -95,10 +105,21 @@ if "%CHECK_RESULT%"=="0" (
 
 REM Add to system PATH
 echo Adding to system PATH...
+echo.
+echo [DEBUG] Current PATH length:
+call :strlen CURRENT_PATH CURRENT_PATH_LEN
+echo [DEBUG] %CURRENT_PATH_LEN% characters
+echo.
+echo [DEBUG] Directory to add: %INSTALL_DIR%
+echo [DEBUG] Length: %INSTALL_DIR_LEN% characters
+echo.
 
 REM Check if new PATH would exceed setx limit (1024 chars)
 set "NEW_PATH=%CURRENT_PATH%;%INSTALL_DIR%"
 call :strlen NEW_PATH NEW_PATH_LEN
+
+echo [DEBUG] New PATH would be: %NEW_PATH_LEN% characters
+echo.
 
 if %NEW_PATH_LEN% GTR 1024 (
     echo [WARN] PATH is too long for setx command (over 1024 characters)
