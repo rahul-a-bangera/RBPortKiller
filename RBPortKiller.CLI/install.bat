@@ -101,8 +101,12 @@ set SETX_RESULT=%errorLevel%
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully added to system PATH!
     echo.
-    echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
-    echo            for changes to take effect.
+    REM Refresh PATH for current session
+    set "PATH=%CURRENT_PATH%;%INSTALL_DIR%"
+    echo [INFO] PATH refreshed for current session
+    echo.
+    echo To use in NEW windows: Close and reopen your Command Prompt/PowerShell
+    echo To use NOW in THIS window: The PATH has been updated for this session
     goto INSTALL_COMPLETE
 ) else (
     echo [ERROR] Failed to update system PATH

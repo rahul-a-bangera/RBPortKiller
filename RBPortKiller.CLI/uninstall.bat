@@ -101,8 +101,12 @@ endlocal & set "NEW_PATH=%NEW_PATH%"
 if "%SETX_RESULT%"=="0" (
     echo [SUCCESS] Successfully removed from system PATH!
     echo.
-    echo IMPORTANT: Close and reopen your Command Prompt/PowerShell
-    echo            for changes to take effect.
+    REM Refresh PATH for current session
+    set "PATH=%NEW_PATH%"
+    echo [INFO] PATH refreshed for current session
+    echo.
+    echo To apply in NEW windows: Close and reopen your Command Prompt/PowerShell
+    echo In THIS window: The PATH has been updated for this session
     goto UNINSTALL_COMPLETE
 ) else (
     echo [ERROR] Failed to update system PATH
