@@ -57,4 +57,10 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
+  <!-- Include installation scripts in publish output -->
+  <ItemGroup>
+    <None Include="install.bat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="uninstall.bat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
