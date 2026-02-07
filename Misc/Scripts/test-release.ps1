@@ -95,7 +95,7 @@ $platforms = @(
 
 $step = 5
 foreach ($platform in $platforms) {
-    Write-Host "[$step/6] Publishing $($platform.Name)..." -ForegroundColor Cyan
+    Write-Host "[$step/7] Publishing $($platform.Name)..." -ForegroundColor Cyan
     
     dotnet publish "RBPortKiller.CLI\RBPortKiller.CLI.csproj" `
         -c Release `
@@ -116,8 +116,16 @@ foreach ($platform in $platforms) {
     $step++
 }
 
+# Copy installation files
+Write-Host "[7/9] Copying installation files..." -ForegroundColor Cyan
+
+foreach ($platform in $platforms) {
+    Copy-Item "RBPortKiller.CLI\install.ps1" -Destination ".\publish\$($platform.Runtime)\" -Force
+    Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\$($platform.Runtime)\" -Force
+}
+
 # Create archives
-Write-Host "[7/8] Creating ZIP archives..." -ForegroundColor Cyan
+Write-Host "[8/9] Creating ZIP archives..." -ForegroundColor Cyan
 
 foreach ($platform in $platforms) {
     $zipName = "rbportkiller-$($platform.Runtime).zip"
@@ -127,7 +135,7 @@ foreach ($platform in $platforms) {
 }
 
 # Calculate checksums
-Write-Host "[8/8] Calculating checksums..." -ForegroundColor Cyan
+Write-Host "[9/9] Calculating checksums..." -ForegroundColor Cyan
 
 $checksums = @()
 Get-ChildItem ".\release-test\*.zip" | ForEach-Object {

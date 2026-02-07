@@ -94,6 +94,14 @@ jobs:
             -p:EnableCompressionInSingleFile=true `
             -o ./publish/win-x86
         
+      - name: Copy installation files
+        run: |
+          Copy-Item "RBPortKiller.CLI\install.ps1" -Destination ".\publish\win-x64\"
+          Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\win-x64\"
+          
+          Copy-Item "RBPortKiller.CLI\install.ps1" -Destination ".\publish\win-x86\"
+          Copy-Item "RBPortKiller.CLI\README.txt" -Destination ".\publish\win-x86\"
+        
       - name: Create ZIP Archives
         run: |
           Compress-Archive -Path .\publish\win-x64\* -DestinationPath .\rbportkiller-win-x64.zip
@@ -120,49 +128,24 @@ jobs:
         run: |
           $version = "${{ needs.check-version.outputs.version }}"
           
-          $checksums = Get-Content checksums.txt -Raw
-          
           $notes = @"
           ## RBPortKiller v$version
           
-          A Windows CLI tool for viewing and managing network ports and their associated processes.
-          
-          ### Downloads
-          
-          | Platform | Architecture | File |
-          |----------|-------------|------|
-          | Windows | x64 | ``rbportkiller-win-x64.zip`` |
-          | Windows | x86 | ``rbportkiller-win-x86.zip`` |
+          A cross-platform CLI tool for viewing and managing network ports and their associated processes.
+          Built with .NET 8, featuring an intuitive interface for monitoring active connections and terminating port-blocking processes.
           
           ### Installation
           
-          **Windows:**
-          ``````powershell
-          Expand-Archive -Path rbportkiller-win-x64.zip -DestinationPath .\rbportkiller
-          .\rbportkiller\rbportkiller.exe
-          ``````
           
-          ### What's New
+          1. Download the appropriate ZIP file for your system from the Assets section below
+          2. Extract the ZIP file to your desired location
+          3. Run the included installer for automatic PATH setup:
+             - **Windows**: Right-click ``install.bat`` and select "Run as administrator"
+             - **PowerShell**: Run ``.\install.ps1`` (or as administrator for system-wide install)
+          4. Restart your command prompt/PowerShell
+          5. Type ``rbportkiller`` from any directory to launch the tool
           
-          See the README.md for feature details and usage instructions
-          
-          ### Security Note
-          
-          This executable is not digitally signed. Windows may display a security warning on first run.
-          - Right-click the file, select Properties, check "Unblock", then click Apply
-          - Or click "More info" and "Run anyway" when prompted
-          
-          The source code is fully open source and available for review.
-          
-          ### Checksums (SHA256)
-          
-          ``````
-          $checksums
-          ``````
-          
-          ---
-          
-          **Full Changelog:** https://github.com/rahul-a-bangera/RBPortKiller/compare/v$version
+          **Manual Installation**: Run ``rbportkiller.exe`` directly or add the folder to your system PATH manually. See ``README.txt`` in the package for details.
           "@
           
           $notes | Out-File -FilePath release_notes.md -Encoding utf8
