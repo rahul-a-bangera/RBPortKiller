@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'RBPortKiller.CLI/RBPortKiller.CLI.csproj'
 
 permissions:
   contents: write
@@ -46,9 +44,7 @@ jobs:
             echo "New version detected: v$VERSION"
           fi
 
-  build-and-release:
-    needs: check-version
-    if: needs.check-version.outputs.version-changed == 'true'
+  build:
     runs-on: windows-latest
     
     steps:
@@ -69,6 +65,21 @@ jobs:
       - name: Run tests
         run: dotnet test --no-restore --verbosity normal
         continue-on-error: true
+
+  release:
+    needs: [check-version, build]
+    if: needs.check-version.outputs.version-changed == 'true'
+    runs-on: windows-latest
+    
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           
       - name: Publish Windows x64
         run: |
@@ -139,13 +150,12 @@ jobs:
           
           1. Download the appropriate ZIP file for your system from the Assets section below
           2. Extract the ZIP file to your desired location
-          3. Run the included installer for automatic PATH setup:
-             - **Windows**: Right-click ``install.bat`` and select "Run as administrator"
-             - **PowerShell**: Run ``.\install.ps1`` (or as administrator for system-wide install)
+          3. Run the PowerShell installer: ``.\install.ps1``
+             - For system-wide install: Right-click PowerShell > "Run as Administrator" then run the script
           4. Restart your command prompt/PowerShell
           5. Type ``rbportkiller`` from any directory to launch the tool
           
-          **Manual Installation**: Run ``rbportkiller.exe`` directly or add the folder to your system PATH manually. See ``README.txt`` in the package for details.
+          **Manual**: Run ``rbportkiller.exe`` directly or add the folder to your PATH. See ``README.txt`` for details.
           "@
           
           $notes | Out-File -FilePath release_notes.md -Encoding utf8
